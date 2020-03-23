@@ -100,7 +100,7 @@ export class AnimationCapture implements EngineFrames {
 
         this.logger.debug(this.constructor.name, 'got next frame rate', frameRate);
 
-        if (this.needDelay || this.currentFrame === 0) {
+        if (this.needDelay || this.currentFrame === 1) {
             const delay = this.delay > 0
                 ? (Math.floor(this.delay / frameRate)) + (Math.ceil(frameRate / 2) * Math.ceil(this.delay % frameRate))
                 : Math.ceil(frameRate / 2);
