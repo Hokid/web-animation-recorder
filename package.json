@@ -1,0 +1,20 @@
+{
+  "name": "web-animation-recorder",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index",
+  "author": "Kirill Khoroshilov <mr.hokid@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "12.12.30",
+    "@types/puppeteer": "2.0.1",
+    "typescript": "3.8.3"
+  },
+  "dependencies": {
+    "puppeteer": "2.1.1",
+    "tslib": "^1.11.1"
+  }
+}
