@@ -39,14 +39,14 @@ export class FsOutput extends Writable {
         callback = (err) => {
             if (err) {
                 this.logger.error(this.constructor.name, 'save request failed', {
-                    path: this.getFilePath(),
-                    frame: this.frame,
+                    path: framePath,
+                    frame,
                     error: err
                 });
             } else {
                 this.logger.debug(this.constructor.name, 'save request processed', {
-                    path: this.getFilePath(),
-                    frame: this.frame
+                    path: framePath,
+                    frame
                 });
             }
 
