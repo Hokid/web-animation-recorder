@@ -19,6 +19,7 @@ export class AnimationCaptureState {
     lastStopAnimationCallTime: number = 0;
     lastWaitCallTime: number = 0;
     wait: number = 0;
+    timePointer: number = 0;
     currentFramesFractionsParts: number = 0;
 
     constructor(
@@ -42,6 +43,14 @@ export class AnimationCaptureState {
         this.frameDurationWholePart = Math.floor(this.frameDuration);
         this.frameDurationFractionPart = this.frameDuration % 1;
         this.totalFrames = Math.floor(this.duration / 1000 * this.fps);
+    }
+
+    nextFrame() {
+        this.currentFrame++;
+    }
+
+    updateTimePointer() {
+        this.timePointer += this.wait + this.lastLag;
     }
 
     updateWait() {

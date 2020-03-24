@@ -61,27 +61,14 @@ export class AnimationCapture implements EngineFrames {
             return false;
         }
 
-        ++state.currentFrame;
+        state.nextFrame();
 
-        this.logger.debug(this.constructor.name, 'preparing next frame', this.state.clone());
+        this.logger.debug(this.constructor.name, 'preparing frame', this.state.clone());
 
-        if (state.currentFrame === 1) {
-            state.updateWait();
-
-            await this.startAnimation();
-            await this.wait(state.wait);
-            await this.stopAnimation();
-
-            state.updateLag();
-
-            this.logger.debug(this.constructor.name, 'delay applied', this.state.clone());
-            this.logger.debug(this.constructor.name, 'next frame prepared', this.state.clone());
-
-            // we already on the first frame, no need to do start/stop animation again
-            return true;
+        if (state.currentFrame > 1) {
+            state.increaseCurrentFramesFractionsParts();
         }
 
-        state.increaseCurrentFramesFractionsParts();
         state.updateWait();
 
         await this.startAnimation();
@@ -89,8 +76,9 @@ export class AnimationCapture implements EngineFrames {
         await this.stopAnimation();
 
         state.updateLag();
+        state.updateTimePointer();
 
-        this.logger.debug(this.constructor.name, 'next frame prepared', this.state.clone());
+        this.logger.debug(this.constructor.name, 'frame prepared', this.state.clone());
 
         return true;
     }
@@ -98,26 +86,26 @@ export class AnimationCapture implements EngineFrames {
     async reset(): Promise<void> {
     }
 
-    private wait(ms: number): Promise<void> {
-        return new Promise(done => {
-            this.logger.debug(this.constructor.name, 'waiting...', this.state.clone());
-            const start = Date.now();
-            setTimeout(() => {
-                const end = Date.now();
-                this.state.lastWaitCallTime = end - start;
-                this.logger.debug(this.constructor.name, 'waiting done', this.state.clone());
-                done();
-            }, ms);
-        });
+    private async wait(ms: number): Promise<void> {
+        const waiter = new Promise(done => setTimeout(done, ms));
+
+        this.logger.debug(this.constructor.name, 'waiting...', this.state.clone());
+
+        this.state.lastWaitCallTime = await this.measurePendingTime(waiter);
+
+        this.logger.debug(this.constructor.name, 'waiting done', this.state.clone());
     }
 
     private async startAnimation() {
         if (this.state.isAnimationPaused) {
             this.logger.debug(this.constructor.name, 'starting animation...', this.state.clone());
-            const start = Date.now();
-            await (<any>this.page.getPage())._client.send('Animation.setPlaybackRate', {playbackRate: 1});
-            const end = Date.now();
-            this.state.lastStartAnimationCallTime = end - start;
+
+            const pendingTime = await this.measurePendingTime(
+                (<any>this.page.getPage())._client
+                    .send('Animation.setPlaybackRate', {playbackRate: 1})
+            );
+
+            this.state.lastStartAnimationCallTime = pendingTime;
             this.state.isAnimationPaused = false;
             this.logger.debug(this.constructor.name, 'animation started', this.state.clone());
         }
@@ -126,16 +114,25 @@ export class AnimationCapture implements EngineFrames {
     private async stopAnimation() {
         if (!this.state.isAnimationPaused) {
             this.logger.debug(this.constructor.name, 'stopping animation...', this.state.clone());
-            const start = Date.now();
-            await (<any>this.page.getPage())._client.send('Animation.setPlaybackRate', {playbackRate: 0});
-            const end = Date.now();
+
+            const pendingTime = await this.measurePendingTime(
+                (<any>this.page.getPage())._client
+                    .send('Animation.setPlaybackRate', {playbackRate: 0})
+            );
 
             if (this.state.isReady) {
-                this.state.lastStopAnimationCallTime = end - start;
+                this.state.lastStopAnimationCallTime = pendingTime;
             }
 
             this.state.isAnimationPaused = true;
             this.logger.debug(this.constructor.name, 'animation stop', this.state.clone());
         }
+    }
+
+    private async measurePendingTime(promise: Promise<any>): Promise<number> {
+        const start = Date.now();
+        await promise;
+        const end = Date.now();
+        return end - start;
     }
 }
