@@ -22,7 +22,8 @@ export class FsOutput extends Writable {
         this.logger.debug(this.constructor.name, 'directory path: ', this.path);
 
         this.on('finish', () => {
-            this.logger.debug(this.constructor.name, 'all frames saved');
+            this.logger.log(this.constructor.name, 'output dir: ' + this.path);
+            this.logger.log(this.constructor.name, 'frames count: ' + (this.frame ? this.frame - 1 : 0));
         });
     }
 
