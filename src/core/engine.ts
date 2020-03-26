@@ -16,10 +16,12 @@ export interface TargetSelector extends Target {
 export interface EngineParameters {
     url: string;
     fps?: number;
+    speed?: number;
     duration: number;
     delay?: number;
     target: TargetSelector;
     logger: Logger;
+    additional?: any;
 }
 
 export interface EngineFrames {

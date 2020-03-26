@@ -7,6 +7,7 @@ export class AnimationCaptureState {
 
     readonly fps: number = 30;
     readonly delay: number = 0;
+    readonly speed: number = 1;
     readonly duration: number = 0;
     readonly frameDuration: number = 0;
     readonly frameDurationWholePart: number = 0;
@@ -19,6 +20,7 @@ export class AnimationCaptureState {
     lastStopAnimationCallTime: number = 0;
     lastWaitCallTime: number = 0;
     wait: number = 0;
+    virtualWait: number = 0;
     timePointer: number = 0;
     currentFramesFractionsParts: number = 0;
 
@@ -26,7 +28,8 @@ export class AnimationCaptureState {
         parameters: {
             duration: number,
             delay?: number,
-            fps?: number
+            fps?: number,
+            speed?: number
         }
     ) {
         this.duration = parameters.duration;
@@ -39,6 +42,7 @@ export class AnimationCaptureState {
             this.delay = parameters.delay
         }
 
+        this.speed = parameters.speed ? parameters.speed : 30 / this.fps;
         this.frameDuration = 1000 / this.fps;
         this.frameDurationWholePart = Math.floor(this.frameDuration);
         this.frameDurationFractionPart = this.frameDuration % 1;
@@ -56,12 +60,14 @@ export class AnimationCaptureState {
     updateWait() {
         if (this.currentFrame === 1) {
             this.wait = this.getDelay();
-            return;
+        } else {
+            const fractionPartGarbage = this.collectCurrentFramesFractionsPartsGarbage();
+
+            this.wait = this.frameDurationWholePart - fractionPartGarbage;
         }
 
-        const fractionPartGarbage = this.collectCurrentFramesFractionsPartsGarbage();
-
-        this.wait = this.frameDurationWholePart - this.lastLag + fractionPartGarbage;
+        this.virtualWait = this.wait / this.speed + this.lastLag;
+        this.wait += this.lastLag;
     }
 
     private getDelay(): number {
@@ -104,7 +110,7 @@ export class AnimationCaptureState {
     }
 
     updateWaitLag() {
-        this.lastWaitLag = this.lastWaitCallTime - this.wait;
+        this.lastWaitLag = this.lastWaitCallTime - this.virtualWait;
     }
 
     clone(): AnimationCaptureState {

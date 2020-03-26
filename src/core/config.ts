@@ -6,6 +6,7 @@ export interface Config {
         type: OutputConstructor,
         [key: string]: any;
     };
+    engine?: any;
     logsLevel?: number;
     outputLogsToJSON?: boolean;
     fps?: number;

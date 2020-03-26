@@ -23,7 +23,8 @@ export class Studio {
             duration: config.duration,
             delay: config.delay,
             fps: config.fps,
-            logger: this.logger
+            logger: this.logger,
+            additional: config.engine
         });
         const {type: OutputCtr, ...outputArgs} = config.output;
         outputArgs.logger = this.logger;

@@ -24,7 +24,8 @@ export class AnimationCapture implements EngineFrames {
         parameters: {
             duration: number,
             delay?: number,
-            fps?: number
+            fps?: number,
+            speed?: number
         }
     ) {
         this.state = new AnimationCaptureState(parameters);
@@ -72,7 +73,7 @@ export class AnimationCapture implements EngineFrames {
         state.updateWait();
 
         await this.startAnimation();
-        await this.wait(state.wait);
+        await this.wait(state.virtualWait);
         await this.stopAnimation();
 
         state.updateLag();
@@ -102,7 +103,7 @@ export class AnimationCapture implements EngineFrames {
 
             const pendingTime = await this.measurePendingTime(
                 (<any>this.page.getPage())._client
-                    .send('Animation.setPlaybackRate', {playbackRate: 1})
+                    .send('Animation.setPlaybackRate', {playbackRate: this.state.speed})
             );
 
             this.state.lastStartAnimationCallTime = pendingTime;

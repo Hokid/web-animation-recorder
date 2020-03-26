@@ -5,6 +5,11 @@ export class Page {
     private page: Puppeteer.Page | undefined;
     isOpened: boolean = false;
 
+    constructor(private params: {
+        headless?: boolean
+    } = {}) {
+    }
+
     getPage(): Puppeteer.Page {
         if (!this.isOpened) {
             throw new Error('Page is not prepared yet');
@@ -16,7 +21,9 @@ export class Page {
     async preparePage(): Promise<void> {
         if (!this.isOpened) {
             if (!this.browser) {
-                this.browser = await Puppeteer.launch();
+                this.browser = await Puppeteer.launch({
+                    headless: this.params.headless
+                });
             }
 
             if (!this.page) {

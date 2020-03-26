@@ -48,11 +48,16 @@ export class PuppeteerEngine implements Engine {
             return;
         }
 
-        this.page = new Page();
+        const additional = Object.assign({}, this.parameters.additional);
+
+        this.page = new Page({
+            headless: additional.headless
+        });
         this.animationCapture = new AnimationCapture(this.page, this.parameters.logger, {
             delay: this.parameters.delay,
             duration: this.parameters.duration,
-            fps: this.parameters.fps
+            fps: this.parameters.fps,
+            speed: additional.speed
         });
         this.screenshoter = new Screenshoter(this.parameters.target, this.page, this.parameters.logger);
 
