@@ -12,6 +12,7 @@ type Params = {
     logger: Logger;
     repeat?: 0 | -1;
     quality?: number;
+    removeTmp?: boolean;
 }
 
 // If we directly provide chunks to encoder write stream then some frames has missed.
@@ -24,12 +25,17 @@ export class GifEncoderOutput extends Writable {
     private fs: FsOutput;
     private encoder!: GifEncoder;
     private encoderWs!: Writable;
+    private params: Params;
 
-    constructor(private params: Params) {
+    constructor(params: Params) {
         super({
             highWaterMark: 0,
             objectMode: true
         });
+
+        this.params = Object.assign({
+            removeTmp: true
+        }, params);
 
         this.logger = params.logger;
         this.path = path.isAbsolute(params.path)
@@ -105,9 +111,11 @@ export class GifEncoderOutput extends Writable {
     }
 
     private async removeTmpDir(): Promise<void> {
-        await fs.promises.rmdir(this.tmpPath, {
-            recursive: true
-        });
+        if (this.params.removeTmp) {
+            await fs.promises.rmdir(this.tmpPath, {
+                recursive: true
+            });
+        }
     }
 
     private async writeToEncoder(imageBuffer: Buffer): Promise<void> {
