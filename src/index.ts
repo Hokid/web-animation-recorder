@@ -1,6 +1,7 @@
 import {Logger} from './core/logger';
 import {FsOutput} from './outputs/FsOutput';
 import {GifEncoderOutput} from './outputs/GifEncoderOutput';
+import {GifskiOutput} from './outputs/GifskiOutput';
 
 export {Studio} from './Studio';
 export {Config} from './core/config';
@@ -13,5 +14,6 @@ export const LOG_LEVELS = {
 
 export const outputs = {
     FsOutput: FsOutput,
-    GifEncoder: GifEncoderOutput
+    GifEncoder: GifEncoderOutput,
+    Gifski: GifskiOutput
 };
