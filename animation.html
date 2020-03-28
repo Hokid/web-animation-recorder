@@ -23,6 +23,7 @@
         #root div:first-child {
             animation-name: slide;
             animation-fill-mode: none;
+            animation-timing-function: linear;
             animation-iteration-count: infinite;
             animation-duration: 1s;
         }
@@ -68,11 +69,11 @@
         }
 
         function generateKeyFramesContent(fps) {
-            const step = (100 / fps).toFixed(1) * 1;
+            const step = (100 / fps).toFixed(5) * 1;
             let content = '';
             for (let i = 0; i < fps; i++) {
                 content += createKeyFrame(
-                    i * step + (i === 0 ? 0 : 0.1),
+                    i * step + (i === 0 ? 0 : 0.00001),
                     i * -52,
                     i > 0
                 );

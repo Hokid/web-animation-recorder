@@ -63,11 +63,11 @@ export class AnimationCaptureState {
         } else {
             const fractionPartGarbage = this.collectCurrentFramesFractionsPartsGarbage();
 
-            this.wait = this.frameDurationWholePart - fractionPartGarbage;
+            this.wait = this.frameDurationWholePart + fractionPartGarbage;
         }
 
-        this.virtualWait = this.wait / this.speed + this.lastLag;
-        this.wait += this.lastLag;
+        this.virtualWait = this.wait / this.speed - this.lastLag;
+        this.wait -= this.lastLag;
     }
 
     private getDelay(): number {

@@ -4,6 +4,8 @@ import {Engine} from './core/engine';
 import {Output} from './core/output';
 import {PuppeteerEngine} from './engines/puppeteer';
 import {Logger} from './core/logger';
+import {promisify} from 'util';
+import {finished} from 'stream';
 
 export class Studio {
     private readonly director: Director;
@@ -29,10 +31,7 @@ export class Studio {
         const {type: OutputCtr, ...outputArgs} = config.output;
         outputArgs.logger = this.logger;
         this.output = new OutputCtr(outputArgs);
-        this.outputFinished = new Promise((resolve, reject) => {
-            this.output.on('finish', resolve);
-            this.output.on('error', reject);
-        });
+        this.outputFinished = promisify(finished)(this.output);
         this.director = new Director(this.engine, this.logger);
     }
 
